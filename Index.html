@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Treasure Hunt</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 2rem;
+            background: #1a1a2e;
+            color: white;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%231a1a2e"/><path d="M20,20 L80,20 L80,80 L20,80 Z" fill="none" stroke="%23ffd700" stroke-width="2"/><circle cx="50" cy="50" r="15" fill="none" stroke="%23ffd700" stroke-width="1"/></svg>');
+        }
+        
+        .container {
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        h1 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .subtitle {
+            color: #ccc;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+        
+        .chest {
+            width: 200px;
+            height: 120px;
+            background: linear-gradient(to bottom, #8B4513, #5D2906);
+            margin: 2rem auto;
+            border-radius: 10px 10px 20px 20px;
+            position: relative;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .chest:hover {
+            transform: scale(1.05);
+        }
+        
+        .lid {
+            width: 220px;
+            height: 25px;
+            background: linear-gradient(to bottom, #A0522D, #8B4513);
+            position: absolute;
+            top: -25px;
+            left: -10px;
+            border-radius: 10px 10px 0 0;
+            transition: transform 0.5s;
+        }
+        
+        .lock {
+            width: 25px;
+            height: 25px;
+            background: radial-gradient(circle at 30% 30%, #FFD700, #B8860B);
+            border-radius: 50%;
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 8px gold;
+        }
+        
+        .hint {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            display: none; /* This is what users need to change */
+        }
+        
+        .hint h2 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+        
+        .hint p {
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+        
+        .treasure-facts {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            text-align: left;
+        }
+        
+        .treasure-facts h3 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .treasure-facts ul {
+            padding-left: 1.5rem;
+        }
+        
+        .treasure-facts li {
+            margin-bottom: 0.8rem;
+            line-height: 1.5;
+            color: #e0e0e0;
+        }
+        
+        .success {
+            background: rgba(46, 125, 50, 0.2);
+            padding: 1rem;
+            border-radius: 5px;
+            margin-top: 1rem;
+            border: 1px solid rgba(46, 125, 50, 0.5);
+            display: none; /* This will be changed when hint is revealed */
+        }
+        
+        /* These styles activate when hint display is changed */
+        .hint[style*="display: block"] ~ .chest .lid {
+            transform: rotateX(180deg);
+        }
+        
+        .hint[style*="display: block"] ~ .success {
+            display: block;
+            animation: fadeIn 1s;
+        }
+        
+        .hint[style*="display: block"] ~ .chest {
+            animation: glow 2s infinite;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 10px gold; }
+            50% { box-shadow: 0 0 25px gold; }
+        }
+        
+        footer {
+            margin-top: 2rem;
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        .fact-highlight {
+            color: #ffd700;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Treasure Hunt</h1>
+        <p class="subtitle">Find the hidden clue by inspecting this page</p>
+        
+        <div class="hint" id="hint">
+            <h2>First Clue</h2>
+            <p>Congratulations! You've found the first clue. The treasure is hidden where code comes to life and bugs meet their fate.</p>
+            <p><strong>Next step:</strong> Look for the console where messages are logged.</p>
+        </div>
+        
+        <div class="chest">
+            <div class="lid">
+                <div class="lock"></div>
+            </div>
+        </div>
+        
+        <div class="success">
+            <h2>Well Done!</h2>
+            <p>You've successfully unlocked the treasure chest!</p>
+        </div>
+        
+        <div class="treasure-facts">
+            
+            
+            <ul>
+            <li>check the code <span class="fact-highlight">make changes in it</span> and the tresure will be yours.</li>
+                <h3>Treasure Hunt history</h3>
+                <li>Some treasure hunters use <span class="fact-highlight">metal detectors</span> that can detect gold up to 3 feet underground.</li>
+                <li>The <span class="fact-highlight">Oak Island Money Pit</span> has been searched for over 200 years, with no treasure found to date.</li>
+                <li>Modern treasure hunters often rely on <span class="fact-highlight">satellite imagery</span> and ground-penetrating radar.</li>
+            </ul>
+        </div>
+    </div>
+    
+    <footer>
+        Treasure Hunt Challenge - Use your developer skills to unlock secrets
+    </footer>
+</body>
+</html>
